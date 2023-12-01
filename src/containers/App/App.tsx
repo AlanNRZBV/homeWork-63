@@ -1,55 +1,57 @@
 import { Container, Nav, Navbar } from 'react-bootstrap';
-import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
+import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import AddPost from '../AddPost/AddPost.tsx';
 import AboutMe from '../AboutMe/AboutMe.tsx';
 import Contacts from '../Contacts/Contacts.tsx';
 import Home from '../Home/Home.tsx';
-import { useEffect, useRef, useState } from "react";
-import { IPostsItem } from "../../types";
-import axiosApi from "../../axiosApi.ts";
+import { useEffect, useState } from 'react';
+import { IPostsItem } from '../../types';
+import axiosApi from '../../axiosApi.ts';
 
 const App = () => {
   const [posts, setPosts] = useState<IPostsItem[]>([]);
-
-  const isLoaded = useRef(false)
-  const [loadToggle, setLoadToggle]=useState(false)
-  const navigate = useNavigate()
-
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [editId, setEditId]=useState<string>('')
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (isLoaded.current){
-      axiosApi
-        .get('/posts.json')
-        .then((response) => {
-          const newPosts = Object.keys(response.data).map((id) => ({ id, ...response.data[id] }))
+    if (isLoaded) {
+      axiosApi.get('/posts.json').then((response) => {
+        if (response.data !== null) {
+          const newPosts = Object.keys(response.data).map((id) => ({ id, ...response.data[id] }));
           setPosts(newPosts);
-        });
+        }
+      });
     }
-    isLoaded.current=true
-  }, [loadToggle]);
+    setIsLoaded(true);
+  }, [isLoaded]);
 
-  const unwrapPost = (key:string | undefined)=>{
-    console.log(key)
-  }
+  const unwrapPost = () => {
+    console.log('UNWRAPPING POST');
+  };
 
-  const loadNewPost = ()=>{
-    setLoadToggle(prevState => !prevState)
-  }
+  const toggleIsLoaded = () => {
+    if (isLoaded) {
+      setIsLoaded((prevState) => !prevState);
+    }
+  };
 
-  const deletePost = async (key:string | undefined)=>{
-    const id = `/posts/${key}.json`
+  const deletePost = async (key: string) => {
+    const id = `/posts/${key}.json`;
     try {
-    await axiosApi.delete(id)
+      await axiosApi.delete(id);
       setPosts((prevPosts) => {
         const newPosts = [...prevPosts];
         return newPosts.filter((post) => post.id !== key);
       });
-      setLoadToggle(prevState => !prevState)
-      navigate('/')
-    }catch (error){
-      console.log(`Deleting post with id:${id} cause and error:${error}`)
+      navigate('/');
+    } catch (error) {
+      console.log(`Deleting post with id:${id} cause and error:${error}`);
     }
+  };
 
+  const editPost = (key:string)=>{
+      setEditId(key)
   }
   return (
     <>
@@ -80,8 +82,10 @@ const App = () => {
       <main>
         <Container className="pt-3">
           <Routes>
-            <Route path="/" element={<Home posts={posts} onUnwrap={unwrapPost} onDelete={deletePost}/>} />
-            <Route path="/add-post" element={<AddPost loadNewPost={loadNewPost} />} />
+            <Route path="/" element={<Home posts={posts} onUnwrap={unwrapPost} />} />
+            <Route path="/:id" element={<Home posts={posts} onUnwrap={unwrapPost} onDelete={deletePost} onEdit={editPost}/>} />
+            <Route path="/add-post" element={<AddPost loadNewPost={toggleIsLoaded} editId={editId}/>} />
+            <Route path="/:id/edit" element={<AddPost loadNewPost={toggleIsLoaded} editId={editId}/>} />
             <Route path="/about-me" element={<AboutMe />} />
             <Route path="/contacts" element={<Contacts />} />
           </Routes>

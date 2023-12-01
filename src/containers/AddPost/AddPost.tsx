@@ -1,38 +1,69 @@
 import { Button, Form, FormGroup } from 'react-bootstrap';
-import React, { FC, useCallback, useState } from "react";
-import { IAddPost, IInputData } from "../../types";
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import { IAddPost, IInputData } from '../../types';
 import moment from 'moment';
 import axiosApi from '../../axiosApi.ts';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
-const AddPost:FC<IAddPost> = ({loadNewPost}) => {
-  const initialInputData: IInputData = {
+const AddPost: FC<IAddPost> = ({ loadNewPost, editId }) => {
+  const [inputData, setInputData] = useState<IInputData>({
     title: '',
     date: '',
     text: '',
-  };
-
-  const [inputData, setInputData] = useState<IInputData>(initialInputData);
-  const navigate = useNavigate()
-
+  });
+  const [isEdited, setIsEdited] = useState(false);
+  const navigate = useNavigate();
   const inputDataChanged = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInputData((prevState) => ({ ...prevState, [e.target.name]: e.target.value }));
   }, []);
 
+  useEffect(() => {
+    if (editId !== '') {
+      const fetchSinglePost = async () => {
+        await axiosApi.get(`/posts/${editId}.json`).then((response) => {
+          console.log(response.data);
+          setInputData((prevState) => ({ ...prevState, title: response.data.title, text: response.data.text }));
+          setIsEdited(true)
+        });
+      };
+      void fetchSinglePost();
+    }
+  }, [editId]);
+
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const date = new Date();
-    const convertedDate = moment(date).format('MMM Do YY, h:mm:ss');
-    setInputData((prevState) => ({ ...prevState, date: convertedDate }));
+    if (!isEdited) {
+      const date = new Date();
+      const convertedDate = moment(date).format('MMM Do YY, h:mm:ss');
+      setInputData((prevState) => ({ ...prevState, date: convertedDate }));
       try {
-        await axiosApi.post('/posts.json', {...inputData, date: convertedDate});
-        loadNewPost()
-        navigate('/')
+        await axiosApi.post('/posts.json', { ...inputData, date: convertedDate });
+        if (loadNewPost) {
+          loadNewPost();
+        }
+        navigate('/');
       } catch (error) {
         console.log('Caught while sending post to DB: ' + error);
       } finally {
-        setInputData(initialInputData);
+        setInputData((prevState) => ({ ...prevState, title: '', date: '', text: '' }));
       }
+    }else{
+      console.log('EDITED')
+      const date = new Date();
+      const convertedDate = moment(date).format('MMM Do YY, h:mm:ss');
+      setInputData((prevState) => ({ ...prevState, date: convertedDate }));
+      try {
+        await axiosApi.put(`/posts/${editId}.json`, { ...inputData, date: convertedDate });
+        if (loadNewPost) {
+          loadNewPost();
+        }
+        navigate('/');
+      } catch (error) {
+        console.log('Caught while sending post to DB: ' + error);
+      } finally {
+        setInputData((prevState) => ({ ...prevState, title: '', date: '', text: '' }));
+      }
+    }
   };
 
   return (

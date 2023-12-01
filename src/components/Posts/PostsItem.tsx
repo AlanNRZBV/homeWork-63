@@ -1,25 +1,36 @@
 import { IPostsItem } from '../../types';
-import { FC, useState } from "react";
+import { FC, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-const PostsItem: FC<IPostsItem> = ({ title, text, date, onUnwrap, id, onDelete }) => {
-  const [fullPost, setFullPost]=useState(false)
+const PostsItem: FC<IPostsItem> = ({ title, text, date, onUnwrap, id, onDelete, onEdit }) => {
+  const [fullPost, setFullPost] = useState(false);
 
-  const postUnwrapper = () => {
+  const unwrapHandler = () => {
     if (onUnwrap) {
-      onUnwrap(id);
-      setFullPost(prevState => !prevState)
+      onUnwrap();
+      setFullPost((prevState) => !prevState);
     }
   };
 
-  const deleteHandler =()=>{
-    if (onDelete){
+  const deleteHandler = () => {
+    if (onDelete) {
+      if(id){
       onDelete(id);
+      }
+    }
+  };
+
+  const editHandler =()=>{
+    if (onEdit) {
+      if(id){
+        onEdit(id);
+      }
     }
   }
 
-  const confirm = ()=>{
-    setFullPost(prevState => !prevState)
-  }
+  const confirm = () => {
+    setFullPost((prevState) => !prevState);
+  };
 
   return (
     <div className="border border-1 rounded-3 py-3 px-3 mb-3 shadow-sm">
@@ -28,9 +39,9 @@ const PostsItem: FC<IPostsItem> = ({ title, text, date, onUnwrap, id, onDelete }
         <span className="text-secondary me-auto">{date}</span>
         {fullPost ? (
           <div>
-            <button className="btn btn-outline-warning me-3" type="button">
+            <Link onClick={editHandler} to={'/' + id + '/edit'} className="btn btn-outline-warning me-3">
               Edit
-            </button>
+            </Link>
             <button onClick={deleteHandler} className="btn btn-outline-danger" type="button">
               Delete
             </button>
@@ -39,14 +50,17 @@ const PostsItem: FC<IPostsItem> = ({ title, text, date, onUnwrap, id, onDelete }
           <></>
         )}
       </div>
-      {fullPost ? (<div>
-        <p>{text}</p>
-          <button onClick={confirm} className="btn btn-outline-success" type="button">Confirm</button>
+      {fullPost ? (
+        <div>
+          <p>{text}</p>
+          <button onClick={confirm} className="btn btn-outline-secondary" type="button">
+            Close
+          </button>
         </div>
       ) : (
-        <button onClick={postUnwrapper} className="btn btn-outline-secondary" type="button">
+        <Link onClick={unwrapHandler} to={'/' + id}>
           Read more
-        </button>
+        </Link>
       )}
     </div>
   );

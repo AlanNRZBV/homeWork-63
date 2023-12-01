@@ -1,27 +1,31 @@
 import React from 'react';
 
-export interface IPosts extends React.PropsWithChildren {
-}
+export interface IPosts extends React.PropsWithChildren {}
 export interface IPostsItem {
   id?: string;
   date: string;
   title: string;
   text: string;
-  onUnwrap?: (key: string | undefined) => void;
-  onDelete?: (key: string | undefined) => void;
+  onUnwrap?: () => void;
+  onDelete?: (key: string) => void;
+  onEdit?: (key: string) => void;
 }
 
 export interface IInputData {
+  id?: string
   date: string;
   title: string;
   text: string;
 }
 
 export interface IHome {
-  posts: IPostsItem[]
-  onUnwrap?: (key: string | undefined) => void;
-  onDelete?: (key: string | undefined) => void;
+  posts: IPostsItem[];
+  onUnwrap?: () => void;
+  onDelete?: (key: string) => void;
+  onEdit?: (key: string) => void;
+
 }
 export interface IAddPost {
-  loadNewPost: ()=>void
+  loadNewPost: () => void;
+  editId: string
 }
