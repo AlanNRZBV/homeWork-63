@@ -1,10 +1,11 @@
 import { Button, Form, FormGroup } from 'react-bootstrap';
-import React, { useCallback, useState } from "react";
-import { IInputData } from '../../types';
+import React, { FC, useCallback, useState } from "react";
+import { IAddPost, IInputData } from "../../types";
 import moment from 'moment';
 import axiosApi from '../../axiosApi.ts';
+import { useNavigate } from "react-router-dom";
 
-const AddPost = () => {
+const AddPost:FC<IAddPost> = ({loadNewPost}) => {
   const initialInputData: IInputData = {
     title: '',
     date: '',
@@ -12,6 +13,7 @@ const AddPost = () => {
   };
 
   const [inputData, setInputData] = useState<IInputData>(initialInputData);
+  const navigate = useNavigate()
 
   const inputDataChanged = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInputData((prevState) => ({ ...prevState, [e.target.name]: e.target.value }));
@@ -24,12 +26,13 @@ const AddPost = () => {
     setInputData((prevState) => ({ ...prevState, date: convertedDate }));
       try {
         await axiosApi.post('/posts.json', {...inputData, date: convertedDate});
+        loadNewPost()
+        navigate('/')
       } catch (error) {
         console.log('Caught while sending post to DB: ' + error);
       } finally {
         setInputData(initialInputData);
       }
-
   };
 
   return (
