@@ -3,7 +3,7 @@ import { NavLink, Route, Routes } from 'react-router-dom';
 import AddPost from '../AddPost/AddPost.tsx';
 import AboutMe from '../AboutMe/AboutMe.tsx';
 import Contacts from '../Contacts/Contacts.tsx';
-import Home from "../Home/Home.tsx";
+import Home from '../Home/Home.tsx';
 
 function App() {
   return (
@@ -33,12 +33,14 @@ function App() {
         </Navbar>
       </header>
       <main>
-        <Routes>
-          <Route path="/" element={<Home/>} />
-          <Route path="/add-post" element={<AddPost />} />
-          <Route path="/about-me" element={<AboutMe />} />
-          <Route path="/contacts" element={<Contacts />} />
-        </Routes>
+        <Container className="pt-3">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/add-post" element={<AddPost />} />
+            <Route path="/about-me" element={<AboutMe />} />
+            <Route path="/contacts" element={<Contacts />} />
+          </Routes>
+        </Container>
       </main>
     </>
   );
