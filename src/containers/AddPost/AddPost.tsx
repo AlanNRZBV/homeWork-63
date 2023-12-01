@@ -1,28 +1,36 @@
 import { Button, Form, FormGroup } from 'react-bootstrap';
-import React, { useState } from 'react';
-import { IInputData, IPostsItem } from '../../types';
-import moment from 'moment'
+import React, { useCallback, useState } from "react";
+import { IInputData } from '../../types';
+import moment from 'moment';
+import axiosApi from '../../axiosApi.ts';
 
 const AddPost = () => {
-
-  const [inputData, setInputData] = useState<IInputData>({
+  const initialInputData: IInputData = {
     title: '',
     date: '',
     text: '',
-  });
+  };
 
+  const [inputData, setInputData] = useState<IInputData>(initialInputData);
 
-  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>)=>{
-    setInputData(prevState => ({...prevState, [e.target.name]: e.target.value}))
-    console.log(inputData)
-  }
+  const inputDataChanged = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputData((prevState) => ({ ...prevState, [e.target.name]: e.target.value }));
+  }, []);
 
-  const submitHandler = (e: React.FormEvent<HTMLFormElement>)=>{
-    e.preventDefault()
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const date = new Date();
-    const convertedDate = moment(date).format("MMM Do YY")
-    setInputData(prevState => ({...prevState, date: convertedDate}))
-  }
+    const convertedDate = moment(date).format('MMM Do YY, h:mm:ss');
+    setInputData((prevState) => ({ ...prevState, date: convertedDate }));
+      try {
+        await axiosApi.post('/posts.json', {...inputData, date: convertedDate});
+      } catch (error) {
+        console.log('Caught while sending post to DB: ' + error);
+      } finally {
+        setInputData(initialInputData);
+      }
+
+  };
 
   return (
     <section className="border border-1 rounded rounded-3 shadow-sm py-3 px-3">
@@ -32,14 +40,30 @@ const AddPost = () => {
           <Form.Label className="w-100" htmlFor="title">
             Title
           </Form.Label>
-          <Form.Control onChange={changeHandler} className="w-50 me-auto" type="text" name="title" id="title" value={inputData.title} required/>
+          <Form.Control
+            onChange={inputDataChanged}
+            className="w-50 me-auto"
+            type="text"
+            name="title"
+            id="title"
+            value={inputData.title}
+            required
+          />
           <Button className="me-auto" type="submit" variant="primary">
             Submit
           </Button>
         </FormGroup>
         <FormGroup>
           <Form.Label htmlFor="text">Text</Form.Label>
-          <Form.Control onChange={changeHandler} as="textarea" name="text" id="text" rows={12} value={inputData.text} required/>
+          <Form.Control
+            onChange={inputDataChanged}
+            as="textarea"
+            name="text"
+            id="text"
+            rows={12}
+            value={inputData.text}
+            required
+          />
         </FormGroup>
       </Form>
     </section>

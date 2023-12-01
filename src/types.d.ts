@@ -2,7 +2,7 @@ import React from "react";
 
 export interface IPosts extends React.PropsWithChildren{}
 export interface IPostsItem {
-  id: string,
+  id?: string,
   date: string,
   title:string,
   text: string
