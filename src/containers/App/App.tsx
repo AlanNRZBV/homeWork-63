@@ -11,7 +11,7 @@ import axiosApi from '../../axiosApi.ts';
 const App = () => {
   const [posts, setPosts] = useState<IPostsItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [editId, setEditId]=useState<string>('')
+  const [editId, setEditId] = useState<string>('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,12 +23,9 @@ const App = () => {
         }
       });
     }
+    setEditId('');
     setIsLoaded(true);
   }, [isLoaded]);
-
-  const unwrapPost = () => {
-    console.log('UNWRAPPING POST');
-  };
 
   const toggleIsLoaded = () => {
     if (isLoaded) {
@@ -50,9 +47,9 @@ const App = () => {
     }
   };
 
-  const editPost = (key:string)=>{
-      setEditId(key)
-  }
+  const editPost = (key: string) => {
+    setEditId(key);
+  };
   return (
     <>
       <header>
@@ -82,10 +79,10 @@ const App = () => {
       <main>
         <Container className="pt-3">
           <Routes>
-            <Route path="/" element={<Home posts={posts} onUnwrap={unwrapPost} />} />
-            <Route path="/:id" element={<Home posts={posts} onUnwrap={unwrapPost} onDelete={deletePost} onEdit={editPost}/>} />
-            <Route path="/add-post" element={<AddPost loadNewPost={toggleIsLoaded} editId={editId}/>} />
-            <Route path="/:id/edit" element={<AddPost loadNewPost={toggleIsLoaded} editId={editId}/>} />
+            <Route path="/" element={<Home posts={posts} />} />
+            <Route path="/:id" element={<Home posts={posts} onDelete={deletePost} onEdit={editPost} />} />
+            <Route path="/add-post" element={<AddPost loadNewPost={toggleIsLoaded} editId={editId} />} />
+            <Route path="/:id/edit" element={<AddPost loadNewPost={toggleIsLoaded} editId={editId} />} />
             <Route path="/about-me" element={<AboutMe />} />
             <Route path="/contacts" element={<Contacts />} />
           </Routes>

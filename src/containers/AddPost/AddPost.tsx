@@ -23,7 +23,7 @@ const AddPost: FC<IAddPost> = ({ loadNewPost, editId }) => {
         await axiosApi.get(`/posts/${editId}.json`).then((response) => {
           console.log(response.data);
           setInputData((prevState) => ({ ...prevState, title: response.data.title, text: response.data.text }));
-          setIsEdited(true)
+          setIsEdited(true);
         });
       };
       void fetchSinglePost();
@@ -32,37 +32,22 @@ const AddPost: FC<IAddPost> = ({ loadNewPost, editId }) => {
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isEdited) {
-      const date = new Date();
-      const convertedDate = moment(date).format('MMM Do YY, h:mm:ss');
-      setInputData((prevState) => ({ ...prevState, date: convertedDate }));
-      try {
+    const date = new Date();
+    const convertedDate = moment(date).format('MMM Do YY, h:mm:ss');
+    setInputData((prevState) => ({ ...prevState, date: convertedDate }));
+    try {
+      if (!isEdited) {
         await axiosApi.post('/posts.json', { ...inputData, date: convertedDate });
-        if (loadNewPost) {
-          loadNewPost();
-        }
-        navigate('/');
-      } catch (error) {
-        console.log('Caught while sending post to DB: ' + error);
-      } finally {
-        setInputData((prevState) => ({ ...prevState, title: '', date: '', text: '' }));
-      }
-    }else{
-      console.log('EDITED')
-      const date = new Date();
-      const convertedDate = moment(date).format('MMM Do YY, h:mm:ss');
-      setInputData((prevState) => ({ ...prevState, date: convertedDate }));
-      try {
+      } else {
         await axiosApi.put(`/posts/${editId}.json`, { ...inputData, date: convertedDate });
-        if (loadNewPost) {
-          loadNewPost();
-        }
-        navigate('/');
-      } catch (error) {
-        console.log('Caught while sending post to DB: ' + error);
-      } finally {
-        setInputData((prevState) => ({ ...prevState, title: '', date: '', text: '' }));
       }
+      if (loadNewPost) {
+        loadNewPost();
+      }
+      setInputData((prevState) => ({ ...prevState, title: '', date: '', text: '' }));
+      navigate('/');
+    } catch (error) {
+      console.log('Caught while sending post to DB: ' + error);
     }
   };
 

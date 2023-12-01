@@ -12,7 +12,7 @@ export interface IPostsItem {
 }
 
 export interface IInputData {
-  id?: string
+  id?: string;
   date: string;
   title: string;
   text: string;
@@ -23,9 +23,13 @@ export interface IHome {
   onUnwrap?: () => void;
   onDelete?: (key: string) => void;
   onEdit?: (key: string) => void;
-
 }
 export interface IAddPost {
   loadNewPost: () => void;
-  editId: string
+  editId: string;
+}
+export interface IFeedback {
+  username: string;
+  email: string;
+  message: string;
 }

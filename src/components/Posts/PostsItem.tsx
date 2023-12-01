@@ -2,31 +2,28 @@ import { IPostsItem } from '../../types';
 import { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const PostsItem: FC<IPostsItem> = ({ title, text, date, onUnwrap, id, onDelete, onEdit }) => {
+const PostsItem: FC<IPostsItem> = ({ title, text, date, id, onDelete, onEdit }) => {
   const [fullPost, setFullPost] = useState(false);
 
   const unwrapHandler = () => {
-    if (onUnwrap) {
-      onUnwrap();
-      setFullPost((prevState) => !prevState);
-    }
+    setFullPost((prevState) => !prevState);
   };
 
   const deleteHandler = () => {
     if (onDelete) {
-      if(id){
-      onDelete(id);
+      if (id) {
+        onDelete(id);
       }
     }
   };
 
-  const editHandler =()=>{
+  const editHandler = () => {
     if (onEdit) {
-      if(id){
+      if (id) {
         onEdit(id);
       }
     }
-  }
+  };
 
   const confirm = () => {
     setFullPost((prevState) => !prevState);
@@ -53,9 +50,9 @@ const PostsItem: FC<IPostsItem> = ({ title, text, date, onUnwrap, id, onDelete, 
       {fullPost ? (
         <div>
           <p>{text}</p>
-          <button onClick={confirm} className="btn btn-outline-secondary" type="button">
+          <Link onClick={confirm} to={'/'} className="btn btn-outline-secondary">
             Close
-          </button>
+          </Link>
         </div>
       ) : (
         <Link onClick={unwrapHandler} to={'/' + id}>
